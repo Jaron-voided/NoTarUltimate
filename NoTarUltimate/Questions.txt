@@ -1,0 +1,27 @@
+NotarHeader:
+1) I set it up similar to a couple of the pictures you sent me.
+2) I'm unsure if the HeaderFactory should be in this class, or in the NotarFile class if it was with NotarFile 
+    instead I wouldn't have to pass in files, I could just access it from my member.
+3) Ultimately I could iterate through all my files and figure out the DirectoryCount through PayloadSize. I'm 
+    unsure about the PayloadHash currently but I haven't looked into the options.
+4) Should the versions and FeatureFlags be set up interactively? As in the program runs and the command line asks
+    "What version is this" and stores the response as Version? 
+
+NotarFile:
+1) This is what I ultimately want to return from my final method "PackFile" or "CreateNotarFile"
+    aside from this I'm unsure if my factories should reside in here, or any logic.
+
+NotarFileList:
+1) I made a wrapper for NotarFileInfo like you suggested, since the finished NotarFile will have a list of files.
+I'm unsure of what other logic can go in here.
+
+NotarFileInfo:
+1) My FileFactory() should be able to extract information from the filestream and construct my NotarFileInfo
+2) Would I serialize them as I did with my NotarHeader?
+
+NotarPayloadItem
+1) I'm unsure if I even need this class anymore. I still haven't wrapped my head around how I can download a Tar file
+    and extract it if the Tar file didn't contain RawData, but I have a few pages pulled up to read further on it.
+    
+Utils
+1) I imagine there are other utilities I will need to code in here.
