@@ -1,0 +1,7 @@
+Create factories that instantiate the 2 objects.
+Put it in the 3rd object (with factory)
+Run a stream down it serializing each part, header comes last
+copy file data to stream
+align16 each time
+copy file data list to stream
+put header on stream

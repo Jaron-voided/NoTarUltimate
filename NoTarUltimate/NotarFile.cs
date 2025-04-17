@@ -1,13 +1,25 @@
 namespace NoTarUltimate;
 
-class NotarFile
+internal class NotarFile
 {
-    public NotarHeader Header  { get; init; }
-    public NotarFileList Files  { get; init; }
-    //public byte[] PayloadItems  { get; init; }
+    internal string FilePath { get; set; }
+    internal ulong FileSize { get; set; }
+    internal DateTime CreationTime { get; set; }
+    internal DateTime LastModifiedTime { get; set; }
+    internal FileAttributes FileAttributes { get; set; }
+    internal ulong ByteOffset { get; set; }
+    
 
-    public void UnpackFile()
+
+    public void Serialize(Stream stream)
     {
-        
+        throw new NotImplementedException();
     }
+
+    public void Deserialize(Stream stream)
+    {
+        throw new NotImplementedException();
+    }
+    
+    
 }
