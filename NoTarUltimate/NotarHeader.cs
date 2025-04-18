@@ -4,11 +4,11 @@ namespace NoTarUltimate;
 
 internal class NotarHeader
 {
-    const ulong MagicValue = 0x3037317261746F6E; // "notar170"
-    const ushort HeaderSizeInBytes = 0x80;       // 128 bytes
-    
-    ulong _magic = MagicValue;                    // 8 bytes   
-    ushort _headerSize = HeaderSizeInBytes;       // 2 bytes                        
+    private const ulong MagicValue = 0x3037317261746F6E; // "notar170"
+    private const ushort HeaderSizeInBytes = 0x80;       // 128 bytes
+
+    private ulong _magic = MagicValue;                    // 8 bytes   
+    private ushort _headerSize = HeaderSizeInBytes;       // 2 bytes                        
     internal byte VersionMajor { get; set;}               // 1 byte   
     internal byte VersionMinor { get; set;}               // 1 byte
     internal uint FileLayoutVersion { get; set; }         // 4 bytes
@@ -18,8 +18,8 @@ internal class NotarHeader
     internal uint FileListSize { get; set; }             // 4 bytes
     internal uint PayloadOffset { get; set; }            // 4 bytes
     internal uint PayloadSize { get; set; }             // 4 bytes
-    internal ulong PayloadHash { get; set; }             // 20 bytes
-    const int PaddingSize = 68;                         // 68 bytes
+    internal PayloadHash PayloadHash { get; init; }             // 20 bytes
+    private const int PaddingSize = 68;                         // 68 bytes
     
     public void Serialize(Stream stream)
     {
@@ -35,10 +35,10 @@ internal class NotarHeader
         writer.Write(FileListSize);
         writer.Write(PayloadOffset);
         writer.Write(PayloadSize);
-        writer.Write(PayloadHash);
+        PayloadHash.Serialize(stream);
         
         // Add padding to the end
-        for (int i = 0; i < PaddingSize; i += 4)
+        for (var i = 0; i < PaddingSize; i += 4)
         {
             writer.Write(0U);
         }
@@ -47,9 +47,7 @@ internal class NotarHeader
 
     public void Deserialize(Stream stream)
     {
-        NotarHeader header = new NotarHeader();
-
-        using BinaryReader reader = new BinaryReader(stream, Encoding.UTF8, true);
+        using var reader = new BinaryReader(stream, Encoding.UTF8, true);
         _magic = reader.ReadUInt64();
         _headerSize = reader.ReadUInt16();
         VersionMajor = reader.ReadByte();
@@ -61,7 +59,7 @@ internal class NotarHeader
         FileListSize = reader.ReadUInt32();
         PayloadOffset = reader.ReadUInt32();
         PayloadSize = reader.ReadUInt32();
-        PayloadHash = reader.ReadUInt64();
+        PayloadHash.Deserialize(stream);
     }
 
     bool IsValidHeader()

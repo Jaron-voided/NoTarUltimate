@@ -1,15 +1,11 @@
 namespace NoTarUltimate;
 
-class NotarPackage
+class NotarPackage // This is the final object. It holds the header and any nested directories
 {
     public NotarHeader Header  { get; init; }
-    public NotarFileList Files  { get; init; }
-    //public byte[] PayloadItems  { get; init; }
+    public NotarNestedDirectories Directories { get; init; }
 
-    public void UnpackFile()
-    {
-        
-    }
+
     
 
     public void FileFactory(string pathToFile)
@@ -22,14 +18,13 @@ class NotarPackage
         string directoryPath = directory.FullName;
         string filePath = directoryPath + file.FullName;
         
-        NotarFile notarFile = new NotarFile();
+        var notarFile = new NotarFile();
         notarFile.FilePath = filePath;
         notarFile.FileSize = (uint)file.Length;
         notarFile.CreationTime = file.CreationTime;
         notarFile.LastModifiedTime =  file.LastWriteTime;
         notarFile.FileAttributes = file.Attributes;
         //notarFile.ByteOffset = (ulong)file.Length;
-        //return notarFile;
     }
     
     internal void FileListFactory(List<NotarFile> files)
@@ -39,11 +34,10 @@ class NotarPackage
         {
             fileList.Files.Add(file);
         }
-        
-        //return fileList;
     }
-// I can use a blank constructor, then use these methods to add the properties
-// NewPackage.Header = HeaderFactory(); Use this last and I'll have more information
+    
+    // I can use a blank constructor, then use these methods to add the properties
+    // NewPackage.Header = HeaderFactory(); Use this last and I'll have more information
     internal void HeaderFactory(string directoryPath)
     {
         DirectoryInfo directory = new DirectoryInfo(directoryPath);
@@ -65,6 +59,8 @@ class NotarPackage
         uint totalSize = 0;
 
         Header.PayloadOffset = fileCount - 128;
-        
+
+        Header.PayloadSize = (uint)Directories.GetNestedDirectoryPayloadSize();
+        //Header.PayloadHash = ???
     }
 }
