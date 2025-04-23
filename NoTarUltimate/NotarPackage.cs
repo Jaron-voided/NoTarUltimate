@@ -7,8 +7,8 @@ class NotarPackage // This is the final object. It holds the header and any nest
 
 
     
-
-    public void FileFactory(string pathToFile)
+    // Should this one return void also? I'm unsure since Package doesn't contain just a NotarFile, but NotarFileList
+    public NotarFile FileFactory(string pathToFile, Stream stream)
     {
         if (!File.Exists(pathToFile))
             throw new FileNotFoundException(pathToFile);
@@ -23,17 +23,20 @@ class NotarPackage // This is the final object. It holds the header and any nest
         notarFile.FileSize = (uint)file.Length;
         notarFile.CreationTime = file.CreationTime;
         notarFile.LastModifiedTime =  file.LastWriteTime;
-        notarFile.FileAttributes = file.Attributes;
-        //notarFile.ByteOffset = (ulong)file.Length;
+        notarFile.FileAttributes = (uint)file.Attributes;
+        notarFile.ByteOffset = (ulong)Utils.Align16((int)stream.Position);
+        notarFile.IsDirectory = file.Attributes.HasFlag(FileAttributes.Directory);
+        return notarFile;
     }
     
     internal void FileListFactory(List<NotarFile> files)
     {
-        NotarFileList fileList = new NotarFileList();
+        // NotarFileList fileList = new NotarFileList();
         foreach (NotarFile file in files)
         {
-            fileList.Files.Add(file);
+            FileList.Files.Add(file);
         }
+        
     }
     
     // I can use a blank constructor, then use these methods to add the properties
@@ -48,19 +51,20 @@ class NotarPackage // This is the final object. It holds the header and any nest
         Header.DirectoryCount = (ushort)directory.GetDirectories().Length;
         Header.FileCount = (ushort)directory.GetFiles().Length;
 
-        uint fileCount = 0;
+        uint fileListSize = 0;
         foreach (var file in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
         {
-            fileCount +=  (uint)file.Length;
+            fileListSize +=  (uint)file.Length;
         }
         
-        Header.FileListSize = fileCount;
+        Header.FileListSize = fileListSize;
 
         uint totalSize = 0;
 
-        Header.PayloadOffset = fileCount - 128;
+        Header.PayloadOffset = fileListSize - 128;
 
-        Header.PayloadSize = (uint)Directories.GetNestedDirectoryPayloadSize();
+        // Which one is PayloadSize vs FileListSize
+        //Header.PayloadSize = ???
         //Header.PayloadHash = ???
     }
 }

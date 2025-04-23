@@ -19,7 +19,7 @@ internal class NotarHeader
     internal uint PayloadOffset { get; set; }            // 4 bytes
     internal uint PayloadSize { get; set; }             // 4 bytes
     internal PayloadHash PayloadHash { get; init; }             // 20 bytes
-    private const int PaddingSize = 68;                         // 68 bytes
+    internal const int PaddingSize = 68;                         // 68 bytes
     
     public void Serialize(Stream stream)
     {
@@ -62,6 +62,7 @@ internal class NotarHeader
         PayloadHash.Deserialize(stream);
     }
 
+    // I need to use this IsValidHeader method places
     bool IsValidHeader()
     {
         return _magic == MagicValue && _headerSize == 0x80;
