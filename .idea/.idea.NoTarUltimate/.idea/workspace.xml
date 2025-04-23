@@ -8,16 +8,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dd5f329d-90c1-4640-adb9-5d18c9ec80d7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/NoTarUltimate/NotarDirectory.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NoTarUltimate/NotarNestedDirectories.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NoTarUltimate/PayloadHash.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.NoTarUltimate/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.NoTarUltimate/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NoTarUltimate/NotarDirectory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NoTarUltimate/NotarDirectory.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NoTarUltimate/NotarFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NoTarUltimate/NotarFile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NoTarUltimate/NotarFileList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NoTarUltimate/NotarFileList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NoTarUltimate/NotarHeader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NoTarUltimate/NotarHeader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NoTarUltimate/NotarNestedDirectories.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NoTarUltimate/NotarNestedDirectories.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NoTarUltimate/NotarPackage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NoTarUltimate/NotarPackage.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NoTarUltimate/NotarPayloadItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NoTarUltimate/NotarPayloadItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NoTarUltimate/Utils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NoTarUltimate/Utils.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,21 +53,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.General",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.General&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="NoTarUltimate" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -109,7 +104,10 @@
       <workItem from="1744893280746" duration="11461000" />
       <workItem from="1744907523134" duration="972000" />
       <workItem from="1744915131530" duration="8912000" />
-      <workItem from="1744980056327" duration="6353000" />
+      <workItem from="1744980056327" duration="6403000" />
+      <workItem from="1744995848588" duration="619000" />
+      <workItem from="1745162105374" duration="37000" />
+      <workItem from="1745410139002" duration="2908000" />
     </task>
     <servers />
   </component>

@@ -8,8 +8,9 @@ public class NotarFile                          // A single file
     internal ulong FileSize { get; set; }
     internal DateTime CreationTime { get; set; }
     internal DateTime LastModifiedTime { get; set; }
-    internal FileAttributes FileAttributes { get; set; }
+    internal FileAttributes FileAttributes { get; set; } // Unsure what the data type should be since "FileAttribute" doesn't work with BinaryWriter
     private ulong ByteOffset { get; set; }
+    private bool IsDirectory  { get; set; }
     
 
 
@@ -20,10 +21,7 @@ public class NotarFile                          // A single file
         writer.Write(FileSize);
         writer.Write(CreationTime.ToBinary());
         writer.Write(LastModifiedTime.ToBinary());
-        //writer.Write(CreationTime.ToString("yyyy-MM-dd HH:mm:ss"));
-        //writer.Write(LastModifiedTime.ToString("yyyy-MM-dd HH:mm:ss"));
-        foreach(FileAttributes attr in Enum.GetValues(typeof(FileAttributes)))
-            writer.Write(attr.ToString());
+        writer.Write(FileAttributes);
         writer.Write(ByteOffset);
     }
 
@@ -34,9 +32,7 @@ public class NotarFile                          // A single file
         FileSize = reader.ReadUInt64();
         CreationTime = DateTime.FromBinary(reader.ReadInt64());
         LastModifiedTime = DateTime.FromBinary(reader.ReadInt64());
-        FileAttributes = (FileAttributes)reader.ReadInt32();
+        FileAttributes = (uint)reader.ReadInt32();
         ByteOffset = reader.ReadUInt64();
     }
-    
-    
 }

@@ -1,4 +1,4 @@
-namespace NoTarUltimate;
+/*namespace NoTarUltimate;
 
 public class NotarDirectory                                 // This stores a directory with only files
 {
@@ -16,4 +16,4 @@ public class NotarDirectory                                 // This stores a dir
         }
         return totalSize;
     }
-}
+}*/

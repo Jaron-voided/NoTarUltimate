@@ -3,7 +3,7 @@ namespace NoTarUltimate;
 class NotarPackage // This is the final object. It holds the header and any nested directories
 {
     public NotarHeader Header  { get; init; }
-    public NotarNestedDirectories Directories { get; init; }
+    public NotarFileList FileList { get; init; }
 
 
     
@@ -49,7 +49,7 @@ class NotarPackage // This is the final object. It holds the header and any nest
         Header.FileCount = (ushort)directory.GetFiles().Length;
 
         uint fileCount = 0;
-        foreach (FileInfo file in directory.GetFiles())
+        foreach (var file in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
         {
             fileCount +=  (uint)file.Length;
         }
