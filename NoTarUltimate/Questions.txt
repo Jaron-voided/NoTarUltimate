@@ -1,5 +1,5 @@
-* Unsure of what data type FileAttributes should be. If set to FileAttributes Writer.Write throws errors
-* Should the Factory methods go in the NotarPackage class?
-* HeaderFactory needs work
-* Should Pack and UnPack be the orchestrators? If so Stream should be instantiated inside of these
-* If not, where should the Stream originate from?
+1) My NotarHeader looks alright? Is there anymore functionality that is needed within that class?
+2) Same for NotarFile and NotarFileList
+3) I'm taking the Pack and Unpack out of Utils and putting in NotarPackage
+4) Utils is almost empty now, is there anything else?
+5) NotarPackage has questions in comments

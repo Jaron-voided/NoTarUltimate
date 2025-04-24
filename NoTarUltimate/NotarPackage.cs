@@ -1,70 +1,77 @@
 namespace NoTarUltimate;
 
-class NotarPackage // This is the final object. It holds the header and any nested directories
+public class NotarPackage // This is the final object. It holds the header and any nested directories
 {
-    public NotarHeader Header  { get; init; }
-    public NotarFileList FileList { get; init; }
-
-
+    NotarHeader Header { get; set; } = new NotarHeader(); // This instantiates Header when I construct a package
+    NotarFileList FileList { get; set; } = new NotarFileList();
+    public string RelativeTo { get; set; } = string.Empty;
     
-    // Should this one return void also? I'm unsure since Package doesn't contain just a NotarFile, but NotarFileList
-    public NotarFile FileFactory(string pathToFile, Stream stream)
+    public uint FileListSize => FileList.FileListSize();
+
+    public static NotarPackage FromDirectory(string directoryPath)
     {
-        if (!File.Exists(pathToFile))
-            throw new FileNotFoundException(pathToFile);
-        
-        FileInfo file = new FileInfo(pathToFile); // To get info from the file
-        DirectoryInfo directory = file.Directory; // To get info about the dirPath
-        string directoryPath = directory.FullName;
-        string filePath = directoryPath + file.FullName;
-        
-        var notarFile = new NotarFile();
-        notarFile.FilePath = filePath;
-        notarFile.FileSize = (uint)file.Length;
-        notarFile.CreationTime = file.CreationTime;
-        notarFile.LastModifiedTime =  file.LastWriteTime;
-        notarFile.FileAttributes = (uint)file.Attributes;
-        notarFile.ByteOffset = (ulong)Utils.Align16((int)stream.Position);
-        notarFile.IsDirectory = file.Attributes.HasFlag(FileAttributes.Directory);
-        return notarFile;
-    }
-    
-    internal void FileListFactory(List<NotarFile> files)
-    {
-        // NotarFileList fileList = new NotarFileList();
-        foreach (NotarFile file in files)
+        if (!Directory.Exists(directoryPath))
         {
-            FileList.Files.Add(file);
+            throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");;
         }
         
-    }
-    
-    // I can use a blank constructor, then use these methods to add the properties
-    // NewPackage.Header = HeaderFactory(); Use this last and I'll have more information
-    internal void HeaderFactory(string directoryPath)
-    {
-        DirectoryInfo directory = new DirectoryInfo(directoryPath);
-        Header.VersionMajor = 1;
-        Header.VersionMinor = 0;
-        Header.FileLayoutVersion = 1;
-        Header.FeatureFlags = 1;
-        Header.DirectoryCount = (ushort)directory.GetDirectories().Length;
-        Header.FileCount = (ushort)directory.GetFiles().Length;
+        NotarPackage notarPackage = new NotarPackage();
+        {
+            // It doesn't want this to be a static method??
+            RelativeTo = directoryPath;
+        }
 
-        uint fileListSize = 0;
         foreach (var file in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
         {
-            fileListSize +=  (uint)file.Length;
+            notarPackage.FileList.AddFile(file);
         }
-        
-        Header.FileListSize = fileListSize;
+        return notarPackage;
+        //I'll need to run this method then take the returned NotarPackage and add the header adn filelistInfo
+    }
 
-        uint totalSize = 0;
+    public static void ToDirectory(string filePath, string directoryPath)
+    {
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
 
-        Header.PayloadOffset = fileListSize - 128;
+        if (!File.Exists(filePath))
+        {
+            File.Create(filePath).Close();
+        }
+        // I'm unsure on this one, I don't know what else I can do with only the 2 string inputs
+        // Its a static method so I can't do "notarPackage.ToDirectory and have access to all the instances members and data??
+    }
 
-        // Which one is PayloadSize vs FileListSize
-        //Header.PayloadSize = ???
-        //Header.PayloadHash = ???
+    public void Pack(string outputPath)
+    {
+        // Skip Header
+        // Skip FileList
+        // Align all stuff from here down with Align16
+        // Write Paths
+        // Write Payload (fills in FileList offsets and crc)
+        // Complete Header
+        // Seek Beginning
+        // Write Header
+        // Write FileList
+    }
+
+    public void UnPack(string inputPath)
+    {
+        // Skip 128 bytes past header
+        // Use header.FileCount to know how many NotarFiles to skip past on stream??
+        // Header | FileList | Paths | Payload data
+        // Is FileList information stored seperately from the paths? Or just written seperately
+        // Use the first path to create the directory or file.
+        // Use ByteOffset to know where the payload is and write to new file.
+        // Skip back and forth creating directories/files from paths then writing payload.
+    }
+
+    private byte[] ComputePayloadHash(Stream stream)
+    {
+        // Skip to payload Offset, then go forward PayloadSize
+        // Create a byte array
+        // Run SHA256??
     }
 }

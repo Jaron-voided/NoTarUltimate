@@ -6,27 +6,32 @@ static class Utils
     {
         return (value + 0xF) & ~0xF;
     }
+    
 
     static NotarPackage Pack(Stream stream, string directoryPath) // Pack a directory and return a NotarPackage
     {
         NotarPackage package = new NotarPackage();
+        /*package.FileList = new NotarFileList();
+        package.Header = new NotarHeader();*/
+        
         DirectoryInfo directory = new DirectoryInfo(directoryPath);
         List<NotarFile> files = new List<NotarFile>();
         stream.Position = 129; // Move forward to save room for the header
         foreach (var file in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
         {
-            NotarFile notarFile = package.FileFactory(file, stream);
+            NotarFile notarFile = new NotarFile();
             notarFile.Serialize(stream);
             stream.Write(File.ReadAllBytes(file)); // Add the files to the stream
-            files.Add(notarFile);
+            //files.Add(notarFile);
             stream.Position = Utils.Align16((int)stream.Position);
         }
         
-        package.FileListFactory(files);
+        //package.FileListFactory(files);
 
         stream.Position = 0; // Reset to the beginning to add the 128 byte header
-        
-        package.HeaderFactory(directoryPath);
+        NotarHeader header = new NotarHeader();
+        //package.HeaderFactory(directoryPath);
+        header.Serialize(stream);
         
         return package;
     }
