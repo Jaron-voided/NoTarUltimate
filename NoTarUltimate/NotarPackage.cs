@@ -68,9 +68,10 @@ public class NotarPackage // This is the final object. It holds the header and a
         foreach (NotarFile file in FileList.Files) 
         {
             // This should be extracted into a method
-            stream.Seek(Utils.Align16((int)stream.Position), SeekOrigin.Current);
+            file.SerializePath(stream, file.FilePath);
+            /*stream.Seek(Utils.Align16((int)stream.Position), SeekOrigin.Current);
             byte[] path = File.ReadAllBytes(file.FilePath);
-            stream.Write(path, 0, path.Length);
+            stream.Write(path, 0, path.Length);*/
         }
         // The stream should now be to the payload data spot
         Header.PayloadOffset = (uint)Utils.Align16((int)stream.Position);
@@ -124,10 +125,22 @@ public class NotarPackage // This is the final object. It holds the header and a
         stream.Write(headerArrayBytes, 0, NotarHeader.HeaderSizeInBytes);
         notarPackage.Header.Deserialize(memStream);
         
-        /*
-        stream.Seek(NotarHeader.HeaderSizeInBytes + FileListSize, SeekOrigin.Begin);
-        */
-        // skipped past the header and FileListInfo
+        // Deserialize File info minus path
+        foreach (NotarFile file in FileList.Files)
+        {
+            //FileInfo fileInfo = new(file.FilePath);
+            //notarPackage.FileList.AddFile(file.FilePath);
+            file.Deserialize(memStream);
+        }
+
+        // Deserialize file paths
+        foreach (NotarFile file in FileList.Files)
+        {
+            file.DeserializePath(memStream);
+            File.Create(file.FilePath);
+            memStream.Seek((long)file.ByteOffset, SeekOrigin.Current);
+            stream.Write(memStream.ToArray(), 0, (int)file.FileSize);
+        }
     }
 
     private byte[] ComputePayloadHash(Stream stream)
