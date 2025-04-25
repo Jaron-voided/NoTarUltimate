@@ -4,8 +4,8 @@ namespace NoTarUltimate;
 
 internal class NotarHeader
 {
-    private const ulong MagicValue = 0x3037317261746F6E; // "notar170"
-    private const ushort HeaderSizeInBytes = 0x80;       // 128 bytes
+    private const ulong MagicValue = 0x3037317261746F6E;  // 8 bytes "notar170" 
+    internal const ushort HeaderSizeInBytes = 0x80;       // 2 bytes, header = 128 bytes total
 
     private ulong _magic = MagicValue;                    // 8 bytes   
     private ushort _headerSize = HeaderSizeInBytes;       // 2 bytes                        
@@ -13,13 +13,12 @@ internal class NotarHeader
     internal byte VersionMinor { get; set;}               // 1 byte
     internal uint FileLayoutVersion { get; set; }         // 4 bytes
     internal ulong FeatureFlags { get; set; }             // 8 bytes
-    internal ushort DirectoryCount { get; set; }         // 4 bytes
-    internal uint FileCount { get; set; }                // 4 bytes
-    internal uint FileListSize { get; set; }             // 4 bytes
-    internal uint PayloadOffset { get; set; }            // 4 bytes
-    internal uint PayloadSize { get; set; }             // 4 bytes
-    internal PayloadHash PayloadHash { get; init; }             // 20 bytes
-    internal const int PaddingSize = 68;                         // 68 bytes
+    internal uint FileCount { get; set; }                 // 4 bytes
+    internal uint FileListSize { get; set; }              // 4 bytes
+    internal uint PayloadOffset { get; set; }             // 4 bytes
+    internal ulong PayloadSize { get; set; }              // 8 bytes
+    internal PayloadHash PayloadHash { get; init; }       // 20 bytes
+    private const int PaddingSize = 54;                   // 68 bytes
     
     public void Serialize(Stream stream)
     {
@@ -30,7 +29,6 @@ internal class NotarHeader
         writer.Write(VersionMinor);
         writer.Write(FileLayoutVersion);
         writer.Write(FeatureFlags);
-        writer.Write(DirectoryCount);
         writer.Write(FileCount);
         writer.Write(FileListSize);
         writer.Write(PayloadOffset);
@@ -54,7 +52,6 @@ internal class NotarHeader
         VersionMinor = reader.ReadByte();
         FileLayoutVersion = reader.ReadUInt32();
         FeatureFlags = reader.ReadUInt64();
-        DirectoryCount = reader.ReadUInt16();
         FileCount = reader.ReadUInt32();
         FileListSize = reader.ReadUInt32();
         PayloadOffset = reader.ReadUInt32();

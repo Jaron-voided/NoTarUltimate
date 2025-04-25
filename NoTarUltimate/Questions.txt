@@ -1,5 +1,6 @@
-1) My NotarHeader looks alright? Is there anymore functionality that is needed within that class?
-2) Same for NotarFile and NotarFileList
-3) I'm taking the Pack and Unpack out of Utils and putting in NotarPackage
-4) Utils is almost empty now, is there anything else?
-5) NotarPackage has questions in comments
+1) Am I casting to different data types too much?
+2) Pack feels like its good, just needs refactored. Am I headed in the correct direction?
+3) NotarPackage.FromDirectory "RelativeTo" wants to be a non static method?
+4) I went through Header and corrected the bytes and my padding size?
+5) Pack and unpack are going to  be called by another function?
+6) NotarFileList.AddFile | I'm unsure of  how to obtain this information currently
