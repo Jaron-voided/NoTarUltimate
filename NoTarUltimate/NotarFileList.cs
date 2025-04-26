@@ -20,11 +20,7 @@ public class NotarFileList
         notarFile.LastModifiedTime =  file.LastWriteTime;
         notarFile.FileAttributes = (uint)file.Attributes;
         
-        // Gotta work on these 2
-        // notarFile.ByteOffset = (ulong)Utils.Align16((int)stream.Position);
-        
         Files.Add(notarFile);
-        // I feel like more should be happening in here, I'll come back to it
     }
 
  

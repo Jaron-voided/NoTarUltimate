@@ -17,7 +17,7 @@ internal class NotarHeader
     internal uint FileListSize { get; set; }              // 4 bytes
     internal uint PayloadOffset { get; set; }             // 4 bytes
     internal ulong PayloadSize { get; set; }              // 8 bytes
-    internal PayloadHash PayloadHash { get; init; }       // 20 bytes
+    internal PayloadHash PayloadHash { get; set; }       // 20 bytes
     private const int PaddingSize = 54;                   // 68 bytes
     
     public void Serialize(Stream stream)

@@ -5,11 +5,14 @@ namespace NoTarUltimate;
 // A single file
 public class NotarFile                          
 {
+    // These are set with NotarFileList.AddFile
     internal string FilePath { get; set; }
     internal ulong FileSize { get; set; }
     internal DateTime CreationTime { get; set; }
     internal DateTime LastModifiedTime { get; set; }
     internal uint FileAttributes { get; set; }
+    
+    // ByteOffset is set in Pack
     internal ulong ByteOffset { get; set; }
     
     internal const uint NotarFileInfoSize = 0x30;

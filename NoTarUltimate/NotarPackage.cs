@@ -7,18 +7,26 @@ public class NotarPackage // This is the final object. It holds the header and a
 {
     NotarHeader Header { get; set; } = new NotarHeader(); // This instantiates Header when I construct a package
     NotarFileList FileList { get; set; } = new NotarFileList();
-    public string RelativeTo { get; set; } = string.Empty;
+    public string RelativeTo { get; set; } = string.Empty; // changed this from init to stop the FromDirectory RelativeTo error...
 
     public uint FileListSize => FileList.FileListSize;
 
-    public static NotarPackage FromDirectory(string directoryPath)
+    internal NotarPackage()
+    {
+        
+    }
+
+    
+    // This runs before running Pack. I instantiate a NotarPackage with this information
+    // then run newNotarPackage.Pack
+    public NotarPackage FromDirectory(string directoryPath) // changed this from static to get rid of RelativeTo error?
     {
         if (!Directory.Exists(directoryPath))
         {
             throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");;
         }
         
-        NotarPackage notarPackage = new NotarPackage();
+        NotarPackage notarPackage = new();
         {
             // It doesn't want this to be a static method??
             RelativeTo = directoryPath;
@@ -92,23 +100,26 @@ public class NotarPackage // This is the final object. It holds the header and a
         
         // Go back and write the File List
         stream.Seek(Utils.Align16((int)(NotarHeader.HeaderSizeInBytes)), SeekOrigin.Begin); // Gets past header to write file info
-        // Presumably I have already ran (FromDirectory) and my File Info has been filled in?
        
         // Write the file info
         foreach (NotarFile file in FileList.Files)
         {
-            // Do I already have filled in information for these files, I added ByteOffset earlier
-            // But do I need to go through and ascertain the other member data
             file.Serialize(stream);
         }
         
         // back to the header
         stream.Seek(0, SeekOrigin.Begin);
-        
-        // Presumably things like Version are set in a different method?
+
+        Header.VersionMajor = 1;
+        Header.VersionMinor = 1;
+        Header.FileLayoutVersion = 1;
+        Header.FeatureFlags = 1;
         Header.FileCount = FileList.Count;
         Header.FileListSize = FileList.FileListSize;
         Header.PayloadSize = (ulong)(stream.Length - Header.PayloadOffset);
+
+        // Come back to this later...
+        // Header.PayloadHash = ComputePayloadHash(stream);
         Header.Serialize(stream);
     }
 
