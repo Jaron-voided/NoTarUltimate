@@ -19,7 +19,6 @@ public class NotarFile
     public void Serialize(Stream stream) // Writes/Serializes the data into bytes/a file
     {
         using BinaryWriter writer = new(stream, Encoding.UTF8, true);
-        // writer.Write(FilePath);
         writer.Write(FileSize);
         writer.Write(CreationTime.ToBinary());
         writer.Write(LastModifiedTime.ToBinary());
@@ -32,8 +31,6 @@ public class NotarFile
         using BinaryWriter writer = new(stream, Encoding.UTF8, true);
         var relativePath = Path.GetRelativePath(relativeTo, FilePath);
         // Turn the relative path into a byte array
-        //var relativePathBytes = Encoding.UTF8.GetBytes(relativePath);
-        //writer.Write((ushort)relativePathBytes.Length);
         writer.Write(relativePath);
     }
 
