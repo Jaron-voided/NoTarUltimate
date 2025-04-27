@@ -26,17 +26,21 @@ public class NotarPackage // This is the final object. It holds the header and a
             throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");;
         }
         
-        NotarPackage notarPackage = new();
-        {
-            // It doesn't want this to be a static method??
-            RelativeTo = directoryPath;
-        }
+        // NotarPackage notarPackage = new();
+        // {
+        //     // It doesn't want this to be a static method??
+        //     RelativeTo = directoryPath;
+        // }
+
+        this.RelativeTo = directoryPath;
+        /*NotarPackage notarPackage = new();
+        notarPackage.RelativeTo = directoryPath;*/
 
         foreach (var file in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
         {
-            notarPackage.FileList.AddFile(file);
+            this.FileList.AddFile(file);
         }
-        return notarPackage;
+        return this;
         //I'll need to run this method then take the returned NotarPackage and add the header adn filelistInfo
     }
 
@@ -100,7 +104,7 @@ public class NotarPackage // This is the final object. It holds the header and a
         
         // Go back and write the File List
         stream.Seek(Utils.Align16((int)(NotarHeader.HeaderSizeInBytes)), SeekOrigin.Begin); // Gets past header to write file info
-       
+    
         // Write the file info
         foreach (NotarFile file in FileList.Files)
         {
@@ -118,8 +122,8 @@ public class NotarPackage // This is the final object. It holds the header and a
         Header.FileListSize = FileList.FileListSize;
         Header.PayloadSize = (ulong)(stream.Length - Header.PayloadOffset);
 
-        // Come back to this later...
-        // Header.PayloadHash = ComputePayloadHash(stream);
+        MakeHash(stream);
+
         Header.Serialize(stream);
     }
 
@@ -187,7 +191,7 @@ public class NotarPackage // This is the final object. It holds the header and a
         }
     }
 
-    private byte[] ComputePayloadHash(Stream stream)
+    internal byte[] ComputePayloadHash(Stream stream)
     {
         // Skip to payload Offset, then go forward PayloadSize
         // Create a byte array
@@ -203,5 +207,16 @@ public class NotarPackage // This is the final object. It holds the header and a
         using var sha256 = SHA256.Create();
         byte[] payloadHash = sha256.ComputeHash(payload);
         return payloadHash;
+    }
+
+    internal void MakeHash(Stream stream)
+    {
+        var hash = ComputePayloadHash(stream);
+        Header.PayloadHash = new PayloadHash
+        {
+            PayloadHashPartA = BitConverter.ToUInt64(hash, 0),
+            PayloadHashPartB = BitConverter.ToUInt64(hash, 8),
+            PayloadHashPartC = BitConverter.ToUInt32(hash, 16)
+        };
     }
 }

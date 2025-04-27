@@ -4,9 +4,9 @@ namespace NoTarUltimate;
 
 internal struct PayloadHash
 {
-    private ulong PayloadHashPartA { get; set; }  // 8 bytes
-    private ulong PayloadHashPartB { get; set; }  // 8 bytes
-    private uint PayloadHashPartC { get; set; }  // 4 bytes
+    internal ulong PayloadHashPartA { get; set; }  // 8 bytes
+    internal ulong PayloadHashPartB { get; set; }  // 8 bytes
+    internal uint PayloadHashPartC { get; set; }  // 4 bytes
 
     internal void Serialize(Stream stream)
     {
@@ -23,5 +23,7 @@ internal struct PayloadHash
         PayloadHashPartB = reader.ReadUInt64();
         PayloadHashPartC = reader.ReadUInt32();
     }
+
+
 
 }

@@ -55,7 +55,7 @@ internal class NotarHeader
         FileCount = reader.ReadUInt32();
         FileListSize = reader.ReadUInt32();
         PayloadOffset = reader.ReadUInt32();
-        PayloadSize = reader.ReadUInt32();
+        PayloadSize = reader.ReadUInt64();
         PayloadHash.Deserialize(stream);
     }
 

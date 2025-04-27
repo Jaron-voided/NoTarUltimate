@@ -22,7 +22,4 @@ public class NotarFileList
         
         Files.Add(notarFile);
     }
-
- 
-    
 }
