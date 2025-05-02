@@ -1,0 +1,42 @@
+#include <std/mem.pat>
+
+struct NotarHeader {
+  char Magic[8];
+  u16 HeaderSize;
+  u8  VersionMajor;
+  u8  VersionMinor;
+  u32 FileLayoutVersion;
+  u64 Flags;
+  u32 FileCount;
+  u32 FileListSize;
+  u32 PayloadOffset;
+  u64 PayloadSize;
+  u8 PayloadHash[20];
+  char RESERVED[64];
+};
+
+struct NotarFile {
+  u64 FileSize;
+  u64 Created;
+  u64 Modified;
+  u32 FileAttributes;
+  u64 FileOffset;
+  //u32 FileCRC32;
+  u8 Payload[FileSize] @ FileOffset;
+  padding[12];
+};
+
+struct Path {
+  u8 Length;
+  char Name[Length];
+};
+
+
+struct Notar {
+  NotarHeader header;
+  NotarFile files[header.FileCount] @ 0x80;
+  Path paths[header.FileCount] @ (0x80 + header.FileListSize);
+  std::mem::AlignTo<16>;
+};
+
+Notar notar @ 0x0;

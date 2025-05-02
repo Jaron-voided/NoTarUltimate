@@ -6,7 +6,8 @@ internal struct PayloadHash
 {
     internal ulong PayloadHashPartA { get; set; }  // 8 bytes
     internal ulong PayloadHashPartB { get; set; }  // 8 bytes
-    internal uint PayloadHashPartC { get; set; }  // 4 bytes
+    internal ulong PayloadHashPartC { get; set; }  // 8 bytes
+    internal ulong PayloadHashPartD { get; set; }  // 8 bytes
 
     internal void Serialize(Stream stream)
     {
@@ -14,6 +15,7 @@ internal struct PayloadHash
         writer.Write(PayloadHashPartA);
         writer.Write(PayloadHashPartB);
         writer.Write(PayloadHashPartC);
+        writer.Write(PayloadHashPartD);
     }    
     
     internal void Deserialize(Stream stream)
@@ -21,9 +23,7 @@ internal struct PayloadHash
         using BinaryReader reader = new(stream, Encoding.UTF8, true);
         PayloadHashPartA = reader.ReadUInt64();
         PayloadHashPartB = reader.ReadUInt64();
-        PayloadHashPartC = reader.ReadUInt32();
+        PayloadHashPartC = reader.ReadUInt64();
+        PayloadHashPartD = reader.ReadUInt64();
     }
-
-
-
 }

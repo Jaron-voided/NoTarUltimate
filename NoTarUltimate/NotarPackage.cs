@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -9,7 +10,7 @@ public class NotarPackage // This is the final object. It holds the header and a
     NotarFileList FileList { get; set; } = new NotarFileList();
     public string RelativeTo { get; set; } = string.Empty; // changed this from init to stop the FromDirectory RelativeTo error...
 
-    public uint FileListSize => FileList.FileListSize;
+    private uint FileListSize => FileList.FileListSize;
 
     internal NotarPackage()
     {
@@ -26,38 +27,23 @@ public class NotarPackage // This is the final object. It holds the header and a
             throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");;
         }
         
-        // NotarPackage notarPackage = new();
-        // {
-        //     // It doesn't want this to be a static method??
-        //     RelativeTo = directoryPath;
-        // }
-
         this.RelativeTo = directoryPath;
-        /*NotarPackage notarPackage = new();
-        notarPackage.RelativeTo = directoryPath;*/
 
         foreach (var file in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
         {
             this.FileList.AddFile(file);
         }
         return this;
-        //I'll need to run this method then take the returned NotarPackage and add the header adn filelistInfo
     }
 
     public static void ToDirectory(string filePath, string directoryPath)
     {
-        if (!Directory.Exists(directoryPath))
+        NotarPackage notarPackage = new()
         {
-            Directory.CreateDirectory(directoryPath);
-        }
+            RelativeTo = directoryPath
+        };
 
-        if (!File.Exists(filePath))
-        {
-            File.Create(filePath).Close();
-        }
-        // I'm unsure on this one, I don't know what else I can do with only the 2 string inputs
-        // Its a static method so I can't do "notarPackage.ToDirectory and have access to all the instances members and data??
-        // I would just call this in a loop to create all the files I pass to it?
+        notarPackage.UnPack(filePath);
     }
 
     public void Pack(string outputPath)
@@ -73,46 +59,55 @@ public class NotarPackage // This is the final object. It holds the header and a
         // Write FileList
         
         using FileStream stream = new(outputPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        Debug.Assert(stream.Position == 0, "Stream position should be at the beginning");
         
         // Gets past header and file list to start writing paths
         stream.Seek(Utils.Align16((int)(NotarHeader.HeaderSizeInBytes + FileListSize)), SeekOrigin.Begin); 
+        // Debug.Assert((stream.Position - HeaderSizeInBytes) // 48 == 0)
+        // The position should now be advanced header size in bytes, plus some multiple of FileListSize(48)
         
         // Writes all the paths
+        // Debugging shows this starting at 224, (48 * 2) + 128
         foreach (NotarFile file in FileList.Files) 
         {
             // Have I already gotten this information, or is it set in another function?
             // Or do I need to do this manually
             // Is the NotarPackage prepared in any sort before this function?
-            file.SerializePath(stream, file.FilePath);
+            file.SerializePath(stream, file.FilePath); // Paths seem to move the stream 3 spots
         }
         
         // The stream should now be to the payload data spot
+        // Stream position is at 230, Align16 moves it to 240
+        // 
         Header.PayloadOffset = (uint)Utils.Align16((int)stream.Position);
         foreach (NotarFile file in FileList.Files)
         {
-            stream.Seek(Utils.Align16((int)stream.Position), SeekOrigin.Current);
+            // second time around is 252
+            stream.Seek(Utils.Align16((int)stream.Position), SeekOrigin.Begin);
 
-            using BinaryWriter writer = new(stream, Encoding.UTF8, true);
+            using BinaryWriter writer = new(stream, Encoding.UTF8, true); // second one starts at 256
             // capture the spot where the file starts
-            file.ByteOffset = (ulong)stream.Position; 
-            // pretty proud of myself for the above line, I hope its correct
+            file.ByteOffset = (ulong)stream.Position; //first byteoffset is 240 for file one
 
-            // I should use BinaryWriter here, and not just stream.write?
-            byte[] payLoad = File.ReadAllBytes(file.FilePath);
-            writer.Write(payLoad, 0, payLoad.Length);
+            byte[] payLoad = File.ReadAllBytes(file.FilePath); // first payload is 12?
+            writer.Write(payLoad, 0, payLoad.Length); //
         }
         
         // Go back and write the File List
         stream.Seek(Utils.Align16((int)(NotarHeader.HeaderSizeInBytes)), SeekOrigin.Begin); // Gets past header to write file info
-    
+
+        Debug.Assert(stream.Position == 128);
         // Write the file info
         foreach (NotarFile file in FileList.Files)
         {
+            //var position = stream.Position;
             file.Serialize(stream);
+            //Debug.Assert(stream.Position - 48 == position); // These ended up in the correct positions
         }
         
         // back to the header
         stream.Seek(0, SeekOrigin.Begin);
+        Debug.Assert(stream.Position == 0);
 
         Header.VersionMajor = 1;
         Header.VersionMinor = 1;
@@ -125,6 +120,7 @@ public class NotarPackage // This is the final object. It holds the header and a
         MakeHash(stream);
 
         Header.Serialize(stream);
+        Debug.Assert(stream.Position == 128);
     }
 
     public void UnPack(string inputPath)
@@ -132,40 +128,31 @@ public class NotarPackage // This is the final object. It holds the header and a
         // Skip 128 bytes past header
         // Use header.FileCount to know how many NotarFiles to skip past on stream??
         // Header | FileList | Paths | Payload data
-        // Is FileList information stored seperately from the paths? Or just written seperately
-        // Use the first path to create the directory or file.
-        // Use ByteOffset to know where the payload is and write to new file.
         // Skip back and forth creating directories/files from paths then writing payload.
         using FileStream readStream = new(inputPath, FileMode.Open, FileAccess.Read);
-        //using FileStream writeStream = new FileStream();
+        
         NotarPackage notarPackage = new NotarPackage();
         
-        
-        // I'm unsure if I need the following 2 lines anymore
-        // Create a correctly sized array to write my header to
-        //byte[] headerArrayBytes = new byte[NotarHeader.HeaderSizeInBytes];
-        
-        // Read the bytes into the headerArray
-        // bytesRead = readStream.Read(headerArrayBytes, 0, NotarHeader.HeaderSizeInBytes);
-        
-        // Header.Deserialize movees itself the correct amount of bytes for each member
-        // this should deserialize my header and move the stream to the spot after the header, file paths
         notarPackage.Header.Deserialize(readStream);
-        
-        // Create a list to hold partial files, i don't have the paths yet so I can't run 
-        // FileList.AddFile(path)
+        // !!!!!!needs to go to 128
+
         List<NotarFile> files = new();
 
-        for (int i = 0; i < Header.FileCount; i++)
+        for (int i = 0; i < notarPackage.Header.FileCount; i++)
         {
             // Creates empty NotarFile
             NotarFile file = new NotarFile();
             file.Deserialize(readStream);
-            
+            // !!!!!!!!!!!!Needs to go 48
             // Adds the file to FileList, there's not a path yet so I can't run 
             files.Add(file);
         }
         
+        // Seek to the place the paths were written
+        //readStream.Seek(Utils.Align16((int)(NotarHeader.HeaderSizeInBytes + FileListSize)), SeekOrigin.Begin); 
+        readStream.Seek(Utils.Align16((int)(NotarHeader.HeaderSizeInBytes + notarPackage.Header.FileListSize)), SeekOrigin.Begin); 
+
+
         // Deserialize file paths
         foreach (NotarFile file in files)
         {
@@ -173,13 +160,12 @@ public class NotarPackage // This is the final object. It holds the header and a
             file.DeserializePath(readStream);
             
             // Now add the complete file to my FileList
-            FileList.AddFile(file.FilePath);
+            //notarPackage.FileList.AddFile(file.FilePath);
+            notarPackage.FileList.Files.Add(file);
+
         }
         
-        // Stream should be at payload now
-        // Create files and fill in there payload
-        // I should use ToDirectory
-        foreach (NotarFile file in FileList.Files)
+        foreach (NotarFile file in notarPackage.FileList.Files)
         {
             FileStream newFile = new FileStream(file.FilePath, FileMode.CreateNew, FileAccess.Write);
             
@@ -191,25 +177,23 @@ public class NotarPackage // This is the final object. It holds the header and a
         }
     }
 
-    internal byte[] ComputePayloadHash(Stream stream)
+    private byte[] ComputePayloadHash(Stream stream)
     {
         // Skip to payload Offset, then go forward PayloadSize
-        // Create a byte array
-        // Run SHA256??
-        
-        // 20 for the size of PayloadHash?
-        // I don't know how to run ReadExactly without passing a byte[]
         byte[] payload = new byte[Header.PayloadSize];
         
         // Seek to the start of the payload
+        var initialPosition = stream.Position;
         stream.Seek(Header.PayloadOffset, SeekOrigin.Begin);
         stream.ReadExactly(payload, 0, (int)Header.PayloadSize);
         using var sha256 = SHA256.Create();
         byte[] payloadHash = sha256.ComputeHash(payload);
+        
+        stream.Seek(initialPosition, SeekOrigin.Begin);
         return payloadHash;
     }
 
-    internal void MakeHash(Stream stream)
+    private void MakeHash(Stream stream)
     {
         var hash = ComputePayloadHash(stream);
         Header.PayloadHash = new PayloadHash
