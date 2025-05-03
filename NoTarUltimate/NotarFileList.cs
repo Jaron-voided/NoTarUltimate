@@ -15,7 +15,7 @@ public class NotarFileList
         NotarFile notarFile = new NotarFile();
 
         notarFile.FilePath = filePath;
-        //notarFile.FileSize = (uint)file.Length;
+        notarFile.FileSize = (uint)file.Length;
         notarFile.FileSize = (uint)((file.Attributes & FileAttributes.Directory) 
             == FileAttributes.Directory ? 0 : file.Length);
         notarFile.CreationTime = file.CreationTime;

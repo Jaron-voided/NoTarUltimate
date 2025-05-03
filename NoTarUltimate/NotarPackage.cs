@@ -73,7 +73,11 @@ public class NotarPackage // This is the final object. It holds the header and a
             // Have I already gotten this information, or is it set in another function?
             // Or do I need to do this manually
             // Is the NotarPackage prepared in any sort before this function?
-            file.SerializePath(stream, file.FilePath); // Paths seem to move the stream 3 spots
+            var baseDirectoryPath = Path.GetDirectoryName(file.FilePath);
+            
+            file.SerializePath(stream, baseDirectoryPath);
+
+            var path = file.FilePath; // Paths seem to move the stream 3 spots
         }
         
         // The stream should now be to the payload data spot
@@ -158,7 +162,7 @@ public class NotarPackage // This is the final object. It holds the header and a
         {
             // Advances the stream to obtain each filepath
             file.DeserializePath(readStream);
-            
+            var path = file.FilePath;
             // Now add the complete file to my FileList
             //notarPackage.FileList.AddFile(file.FilePath);
             notarPackage.FileList.Files.Add(file);

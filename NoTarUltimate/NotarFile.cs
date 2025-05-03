@@ -46,14 +46,14 @@ public class NotarFile
         // Turn the relative path into a byte array
         
         
-        //writer.Write((ushort)relativePathBytes.Length);
+        writer.Write((ushort)relativePathBytes.Length);
         writer.Write(relativePathBytes);
     }
     public void Deserialize(Stream stream) // Deserializes the data, is it really this simple for these 2?
     {
         var start = stream.Position;
         using var reader = new BinaryReader(stream, Encoding.UTF8, true);
-        FilePath = reader.ReadString();
+        //FilePath = reader.ReadString();
         FileSize = reader.ReadUInt64();
         CreationTime = DateTime.FromBinary(reader.ReadInt64());
         LastModifiedTime = DateTime.FromBinary(reader.ReadInt64());
