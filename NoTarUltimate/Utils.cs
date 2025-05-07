@@ -8,4 +8,17 @@ internal static class Utils
         // stream.Position and aligns it to the next multiple of 16
         return (value + 0xF) & ~0xF;
     }
+
+    public static void RunPack(string directoryPath, string notarOutput)
+    {
+        NotarPackage package = new NotarPackage()
+            .FromDirectory(directoryPath);
+        
+        package.Pack(notarOutput);
+    }
+    
+    public static void RunUnpack(string notarFile, string outputDirectory)
+    {
+        NotarPackage.ToDirectory(notarFile, outputDirectory);
+    }
 }
