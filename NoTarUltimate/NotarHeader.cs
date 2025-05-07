@@ -19,9 +19,9 @@ internal class NotarHeader
     internal uint PayloadOffset { get; set; }             // 4 bytes
     internal ulong PayloadSize { get; set; }              // 8 bytes
     internal PayloadHash PayloadHash { get; set; }        // 32 bytes
-                                                            
-                                                          //=76 bytes 
-                                                          // +
+                                                          // ========  
+                                                          // 76 bytes 
+                                                          //  +
     private const int PaddingSize = 52;                   // 52 bytes
     
     public void Serialize(Stream stream)
@@ -42,6 +42,7 @@ internal class NotarHeader
         // Add padding to the end
         for (var i = 0; i < PaddingSize; i += 4)
         {
+            // Writes 4 bytes of padding each loop
             writer.Write(0U);
         }
         

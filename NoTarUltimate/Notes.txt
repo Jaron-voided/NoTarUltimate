@@ -1,0 +1,3 @@
+Create the given directories to unpack to.
+
+Flesh out the command line options

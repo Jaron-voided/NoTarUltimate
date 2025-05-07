@@ -7,17 +7,15 @@ namespace NoTarUltimate;
 // A single file
 public class NotarFile                          
 {
-    // These are set with NotarFileList.AddFile
     internal string FilePath { get; set; }
     internal ulong FileSize { get; set; }                       // 8 bytes
     internal DateTime CreationTime { get; set; }                // 8 bytes
     internal DateTime LastModifiedTime { get; set; }            // 8 bytes
     internal uint FileAttributes { get; set; }                  // 4 bytes
     
-    // ByteOffset is set in Pack
     internal ulong ByteOffset { get; set; }                     // 8 bytes
     
-    internal const uint NotarFileInfoSize = 0x30; // 48 bytes
+    internal const uint NotarFileInfoSize = 0x30;               // 48 bytes
     
 
 
@@ -42,18 +40,16 @@ public class NotarFile
         using BinaryWriter writer = new(stream, Encoding.UTF8, true);
         var relativePath = Path.GetRelativePath(relativeTo, FilePath);
         
-        var relativePathBytes = Encoding.UTF8.GetBytes(relativePath);
         // Turn the relative path into a byte array
-        
+        var relativePathBytes = Encoding.UTF8.GetBytes(relativePath);
         
         writer.Write((ushort)relativePathBytes.Length);
         writer.Write(relativePathBytes);
     }
-    public void Deserialize(Stream stream) // Deserializes the data, is it really this simple for these 2?
+    public void Deserialize(Stream stream)
     {
         var start = stream.Position;
         using var reader = new BinaryReader(stream, Encoding.UTF8, true);
-        //FilePath = reader.ReadString();
         FileSize = reader.ReadUInt64();
         CreationTime = DateTime.FromBinary(reader.ReadInt64());
         LastModifiedTime = DateTime.FromBinary(reader.ReadInt64());
